@@ -1,17 +1,27 @@
-const express = require('express');
-const app = express();
-const port = 3000;
+require("dotenv").config()
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const express = require('express')
+const app = express()
+const bodyParser = require('body-parser')
+const tasksRouter = require('./routes/tasks.js')
 
-app.listen(port, (err) => {
-    if (err) {
-        return console.log('Something bad happened', err);
-    }
-    console.log(`Server is listening on ${port}`);
-});
+const PORT = process.env.PORT || 3000
 
+app.use(bodyParser.json())
+app.use(express.json())
 
+const logger = (req, res, next) => {
+    console.log(`${req.method}: Request Received On ${req.url}`)
+    next()
+}
 
-module.exports = app;
+app.use(logger)
+app.use(tasksRouter)
+
+module.exports = app
+
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log('Server running on port:', PORT)
+    })
+}
